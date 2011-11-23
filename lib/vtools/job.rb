@@ -6,7 +6,6 @@ module VTools
   class Job
     attr_reader   :video, :id
 
-    # constructor
     def initialize config
       @id = self.object_id.to_i
       @config = validate config
@@ -15,7 +14,7 @@ module VTools
 
     # execute job
     def execute
-      # start callback
+      # start hook
       Handler.exec :job_started, @video, @config.action
 
       result = @video.get_info # we always get info
@@ -27,7 +26,7 @@ module VTools
         result = @video.create_thumbs @config.setup # will return thumbs array
       end
 
-      # final callbacks
+      # final hook
       Handler.exec :job_finished, result, @video, @config.action
       result
     end
@@ -43,6 +42,5 @@ module VTools
       end
       options
     end
-
   end # Job
 end # VTools

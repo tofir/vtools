@@ -7,7 +7,6 @@ module VTools
   class Thumbnailer
     include SharedMethods
 
-    # constructor
     def initialize video
       @video = video
     end

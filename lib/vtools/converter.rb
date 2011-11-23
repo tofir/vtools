@@ -6,7 +6,6 @@ module VTools
   class Converter
     include SharedMethods
 
-    # constructor
     def initialize video
       @video = video
     end

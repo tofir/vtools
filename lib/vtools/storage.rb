@@ -10,19 +10,19 @@ module VTools
 
     class << self
 
-      # constructor (cretes connection)
+      # creates connection
       def connect
         fails __method__ unless @actions[:connect]
         @actions[:connect].call
       end
 
-      # recv basic method
+      # receive basic method
       def recv
         fails __method__ unless @actions[:recv]
         @actions[:recv].call
       end
 
-      # send masic method
+      # send basic method
       def send data
         fails __method__ unless @actions[:send]
         @actions[:send].call(data)
@@ -33,7 +33,7 @@ module VTools
         @actions[:connect] = block
       end
 
-      # callback setter to recieve data
+      # callback setter to receive data
       def recv_action &block
         @actions[:recv] = block
       end
@@ -59,7 +59,6 @@ module VTools
       private
       # errors generator
       def fails meth
-p "fails orig: #{meth}"
         raise NotImplementedError, "VTools::Storage##{meth}_action must be set"
       end
     end # class << self

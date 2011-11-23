@@ -37,7 +37,6 @@ module VTools
       return value
     end
 
-    # to string method
     def to_s
 
       params = collect do |key, value|

@@ -2,8 +2,9 @@
 
 Library can be required via `-r` option
 
-  $ vtools start -- -r library
-  $ vtools start -- -r library.rb
+$ vtools start -- -r library
+
+$ vtools start -- -r library.rb
 
 ```ruby
 # -*- encoding: binary -*-

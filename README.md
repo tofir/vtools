@@ -1,6 +1,6 @@
 # VTools
 
-Daemon video processor tools to operate the video (get info, encode & generate thumbnails).
+Daemon tools to operate the video (get info, encode & generate thumbnails).
 Under the hood ffmpeg & ffmpegthumbnailer are used.
 Some ideas has been taken at the streamio-ffmpeg gem (parse output methods).
 
@@ -10,13 +10,13 @@ Project was developed for the [WebTV](http://web.tv)
 
   (sudo) gem install vtools
 
-Please read changelog to check ffmpeg versions compatibility.
+Please read changelog to check ffmpeg versions compatibility (vtools understands 0.7 & 0.8).
 
 ## Usage
 
 ### Getting started
 
-Before start, daemon should be correctly configured, to have valid access to the storage.
+Before start, daemon should be configured correctly, to have valid access to the storage.
 Mandatory methods are: **connect**, **recv** and **send**.
 
 ``` ruby
@@ -82,7 +82,7 @@ thumbnailer (ffmpegthumbnailer)
 
 ## Start
 
-To launch daemon is enough to require library with storage setup:
+To launch daemon - is enough to require library with storage setup:
   (sudo) vtools start -- -r library
 
 ## Options
@@ -116,6 +116,7 @@ It accepts file name and should return relative path (excluding file name itself
 # path generator (used to )
 VTools.path_generator do |file_name|
   # ..
+  "#{file_name[0..2]}/{file_name[2..4]}"
 end
 
 ```

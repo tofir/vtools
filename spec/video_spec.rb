@@ -249,7 +249,7 @@ describe VTools::Video do
 
   context "#initialize" do
 
-    it "crates instance valid" do
+    it "creates instance valid" do
       VTools::CONFIG[:PWD] = "/root"
       File.stub!(:exists?) { true }
       VTools::Converter.stub!(:new) { nil }

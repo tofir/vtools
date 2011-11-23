@@ -6,7 +6,6 @@ module VTools
   class ThumbsOptions < Hash
     include SharedMethods
 
-    # constructor
     def initialize options = {}
 
       @ignore = [:thumb_count, :thumb_start_point, :quality, :width, :time, :postfix]
@@ -36,7 +35,6 @@ module VTools
       value
     end
 
-    # to string
     def to_s
       params = collect do |key, value|
         "-#{key} #{value}" unless @ignore.include?(key)

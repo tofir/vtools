@@ -11,7 +11,6 @@ module VTools
                 :audio_sample_rate,
                 :convert_options, :thumbs_options
 
-    # json generator
     def to_json(*args)
       ignore = [:@convert_options, :@thumbs_options, :@converter, :@thumbnailer, :@uncertain_duration, :invalid]
 
@@ -24,7 +23,6 @@ module VTools
       hsh.to_json(*args)
     end
 
-    # constructor
     def initialize path
 
       @invalid = true
@@ -97,8 +95,7 @@ module VTools
 
       self
     end
-    
-    # define if is valid video file
+
     def valid?
       not @invalid
     end
@@ -108,17 +105,15 @@ module VTools
       @uncertain_duration
     end
 
-    # width getter
     def width
       resolution.split("x").first.to_i rescue nil
     end
 
-    # height getter
     def height
       resolution.split("x").last.to_i rescue nil
     end
 
-    # aspect ratio getter
+    # aspect ratio calculator
     def calculated_aspect_ratio
       if dar
         w, h = dar.split(":")
@@ -134,7 +129,7 @@ module VTools
       File.size(@path)
     end
 
-    # audio channels getter
+    # valid audio channels index
     def audio_channels
       return nil unless @audio_channels
       return @audio_channels[/\d*/].to_i if @audio_channels["channels"]
@@ -143,7 +138,6 @@ module VTools
       return 6 if @audio_channels["5.1"]
     end
 
-    # frame rate getter
     def frame_rate
       video_stream[/(\d*\.?\d*)\s?fps/] ? $1.to_f : nil
     end

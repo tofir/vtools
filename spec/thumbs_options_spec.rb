@@ -68,7 +68,7 @@ describe VTools::ThumbsOptions do
 
     # [:thumb_count, :thumb_start_point, :quality, :width, :time, :postfix]
     # skps ignored values
-    it "reates valid string representation" do
+    it "creates valid string representation" do
 
       # still empty
       @options.to_s.should == ""

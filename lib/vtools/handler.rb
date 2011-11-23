@@ -2,9 +2,9 @@
 
 module VTools
 
-  # callback handler
-  # allows to execute external script callbacks
-  # multiple callbacs in one placeholder are allowed
+  # hooks handler
+  # allows to execute hooks from external script
+  # multiple hooks in one placeholder are allowed
   #
   # usage:
   #   Handler.set :placeholder_name, &block
@@ -19,14 +19,14 @@ module VTools
     @callbacks = {}
 
     class << self
-      # callbacks setter
+      # hooks setter
       def set action, &block
         action = action.to_sym
         @callbacks[action] = [] unless @callbacks[action].is_a? Array
         @callbacks[action] << block if block_given?
       end
 
-      # pending callbacks exectuion
+      # pending hooks exectuion
       def exec action, *args
         action = action.to_sym
         @callbacks[action].each do |block|
