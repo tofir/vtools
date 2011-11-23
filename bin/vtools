@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# -*- encoding: binary -*-
+
+require 'daemons'
+require 'vtools'
+
+VTools::Options.parse! ARGV
+
+options = {:multiple => true}
+
+if VTools::CONFIG[:logging]
+  options[:backtrace] = true
+  options[:log_output] = true
+  options[:log_dir] = VTools::CONFIG[:PWD]
+end
+
+
+# daemonize server
+Daemons.run_proc 'harvester', options do
+  # start process
+  VTools::Harvester.daemonize!
+end
