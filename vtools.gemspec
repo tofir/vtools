@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
 
   s.name                    = "vtools"
   s.summary                 = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
-  s.description             = File.read(File.join(File.dirname(__FILE__), 'README.md'))
+  s.description             = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
 
   s.extensions              = 'extconf.rb'
   s.requirements            = ['ffmpeg v >= 1.8', 'ffmpegthumbnailer v >= 2', 'gem Daemons v >= 1.1.4']
