@@ -9,7 +9,6 @@ Gem::Specification.new do |s|
   s.summary                 = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
   s.description             = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
 
-  s.extensions              = 'extconf.rb'
   s.requirements            = ['ffmpeg v >= 1.8', 'ffmpegthumbnailer v >= 2', 'gem Daemons v >= 1.1.4']
 
   s.files                   = Dir['**/**']
