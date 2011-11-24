@@ -9,7 +9,6 @@ spec = Gem::Specification.new do |s|
   s.name                    = "vtools"
   s.summary                 = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
   s.description             = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
-  s.extensions              = 'extconf.rb'
   s.version                 = VTools::VERSION.join('.')
   s.requirements            = ['ffmpeg v >= 1.8', 'ffmpegthumbnailer v >= 2', 'gem Daemons v >= 1.1.4']
   s.author                  = "tofir"
