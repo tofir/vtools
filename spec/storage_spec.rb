@@ -99,7 +99,7 @@ describe VTools::Storage do
   context "#fails" do
     it "raises error with valid message" do
       expect do
-        VTools::Storage.method(:fails).call("test_method") 
+        VTools::Storage.method(:fails).call("test_method")
       end.to raise_error NotImplementedError, "VTools::Storage#test_method_action must be set"
     end
   end

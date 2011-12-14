@@ -8,12 +8,12 @@ require "vtools/version"
 spec = Gem::Specification.new do |s|
   s.name                    = "vtools"
   s.summary                 = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
-  s.description             = "Daemon tools to operate the video (get info, encode & generate thumbnails)."
+  s.description             = "FFMPEG & FFMPEGTHUMBNAILER based video processor. Permits to generate thumbs and encode/edit video. Can be started as daemon."
   s.version                 = VTools::VERSION.join('.')
-  s.requirements            = ['ffmpeg v >= 1.8', 'ffmpegthumbnailer v >= 2', 'gem Daemons v >= 1.1.4']
+  s.requirements            = ['ffmpeg v >= 0.5', 'ffmpegthumbnailer v >= 2', 'gem Daemons v >= 1.1.4']
   s.author                  = "tofir"
   s.email                   = "v.tofir@gmail.com"
-  s.homepage                = "http://tofir.comuv.com"
+  s.homepage                = "https://github.com/tofir/vtools"
   s.platform                = Gem::Platform::RUBY
   s.required_ruby_version   = ">=1.9"
   s.files                   = Dir['**/**']

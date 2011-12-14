@@ -1,5 +1,5 @@
 # -*- encoding: binary -*-
- 
+
 ["..", "../../lib", "../../lib/vtools"].each do |path|
   dir = File.expand_path(path, __FILE__)
   $:.unshift dir if dir and not $:.include?(dir)

@@ -15,7 +15,7 @@ module VTools
     # execute job
     def execute
       # start hook
-      Handler.exec :job_started, @video, @config.action
+      Hook.exec :job_started, @video, @config.action
 
       result = @video.get_info # we always get info
 
@@ -27,7 +27,7 @@ module VTools
       end
 
       # final hook
-      Handler.exec :job_finished, result, @video, @config.action
+      Hook.exec :job_finished, result, @video, @config.action
       result
     end
 

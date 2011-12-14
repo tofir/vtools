@@ -89,7 +89,7 @@ module VTools
             end
 
             opts.parse!(argv)
-            Handler.exec :config_parsed # callback
+            Hook.exec :config_parsed # callback
           rescue OptionParser::ParseError => e
             STDERR.puts "ERROR: #{e.message}\n\n", opts
             exit(-1)

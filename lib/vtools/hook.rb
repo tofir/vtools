@@ -2,18 +2,18 @@
 
 module VTools
 
-  # hooks handler
+  # hooks
   # allows to execute hooks from external script
   # multiple hooks in one placeholder are allowed
   #
   # usage:
-  #   Handler.set :placeholder_name, &block
+  #   Hook.set :placeholder_name, &block
   # or
-  #   Handler.collection do
+  #   Hook.collection do
   #     set :placeholder_one, &block
   #     set :placeholder_other, &block
   #   end
-  class Handler
+  class Hook
     include SharedMethods
 
     @callbacks = {}
@@ -39,5 +39,5 @@ module VTools
         instance_eval &block if block_given?
       end
     end # << self
-  end # Handler
+  end # Hook
 end # VTools

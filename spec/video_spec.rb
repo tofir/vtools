@@ -36,11 +36,10 @@ describe VTools::Video do
 
     it "executes thumbnailer" do
       thumb = double(nil)
-      @video.stub(:calculated_aspect_ratio).and_return { 1.2 }
       @video.instance_variable_set(:@thumbnailer, thumb)
 
       setup = { :thumb => "options" }
-      VTools::ThumbsOptions.should_receive(:new).with(setup.merge(:aspect => 1.2))
+      VTools::ThumbsOptions.should_receive(:new).with(setup)
       thumb.should_receive(:run)
 
       @video.create_thumbs setup
@@ -51,10 +50,11 @@ describe VTools::Video do
 
     it "executes converter" do
       convert = double(nil)
+      @video.stub(:calculated_aspect_ratio).and_return(1.2)
       @video.instance_variable_set(:@converter, convert)
 
       setup = { :convert => "options" }
-      VTools::ConvertOptions.should_receive(:new).with(setup)
+      VTools::ConvertOptions.should_receive(:new).with(setup, {:aspect => 1.2})
       convert.should_receive(:run)
 
       @video.convert setup

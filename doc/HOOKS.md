@@ -17,9 +17,9 @@ Multiple actions can be attached for a single hook.
 * thumb_success (video, thumbs_array)
 * thumb_error (video, errors)
 
-``` ruby
+```ruby
 # multiple hooks setup
-VTools::Handler.collection do
+VTools::Hook.collection do
   set :in_convert do |video|
     #..
   end
@@ -31,7 +31,7 @@ VTools::Handler.collection do
 end
 
 # single hook setup
-VTools::Handler.set :job_started do
+VTools::Hook.set :job_started do
   #..
 end
 ```

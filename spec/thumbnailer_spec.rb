@@ -39,7 +39,7 @@ describe VTools::Thumbnailer do
       @output_file = "/#{video.name}_"
 
       VTools.should_receive(:fix_encoding).exactly(@options[:thumb_count].to_i).times.and_return {|str| str}
-      VTools::Handler.should_receive(:exec).with(:before_thumb, video, @options)
+      VTools::Hook.should_receive(:exec).with(:before_thumb, video, @options)
       @thumbnailer.should_receive(:generate_path)
     end
 
@@ -55,28 +55,28 @@ describe VTools::Thumbnailer do
       ]
 
       thumbs_array.each do |index|
-        VTools::Handler.should_receive(:exec).with(:in_thumb, video, index)
+        VTools::Hook.should_receive(:exec).with(:in_thumb, video, index)
       end
 
       @thumbnailer.should_receive(:set_point).exactly(3).times.and_return { |sec| sec }
       @thumbnailer.should_receive(:time_offset).exactly(3).times.and_return { |sec| (sec.is_a?(Hash) ? sec[:thumb_start_point] : sec) }
-      VTools::Handler.should_receive(:exec).with(:thumb_success, video, thumbs_array)
+      VTools::Hook.should_receive(:exec).with(:thumb_success, video, thumbs_array)
 
       @thumbnailer.run.should == thumbs_array
     end
 
     it "creates thumb with postfix and offset" do
-      
+
       @options = {:thumb_count => 1, :thumb_start_point => 3, :postfix => "test.postfix"}
       prepare_thumbnailer
 
       thumbs_array = [ {:path => "#{@output_file}test.postfix.jpg", :offset => 3} ]
 
-      VTools::Handler.should_receive(:exec).with(:in_thumb, video, thumbs_array[0])
+      VTools::Hook.should_receive(:exec).with(:in_thumb, video, thumbs_array[0])
 
       @thumbnailer.should_receive(:set_point).once.and_return { |sec| sec }
       @thumbnailer.should_receive(:time_offset).once.and_return { |sec| sec[:thumb_start_point] }
-      VTools::Handler.should_receive(:exec).with(:thumb_success, video, thumbs_array)
+      VTools::Hook.should_receive(:exec).with(:thumb_success, video, thumbs_array)
 
       @thumbnailer.run.should == thumbs_array
     end
@@ -87,7 +87,7 @@ describe VTools::Thumbnailer do
 
       thumbs_array = [ {:path => "#{@output_file}12.jpg", :offset => 12} ]
 
-      VTools::Handler.stub(:exec)
+      VTools::Hook.stub(:exec)
       @thumbnailer.should_not_receive(:set_point)
       @thumbnailer.should_receive(:time_offset).with(12).once.and_return { |sec| sec }
 
@@ -103,9 +103,9 @@ describe VTools::Thumbnailer do
         {:path => "#{@output_file}2.jpg", :offset => 2},
       ]
 
-      VTools::Handler.should_receive(:exec).with(:thumb_error, video, " Errors: thumbnailer error (/video.name_0.jpg). ")
+      VTools::Hook.should_receive(:exec).with(:thumb_error, video, " Errors: thumbnailer error (/video.name_0.jpg). ")
       thumbs_array.each do |index|
-        VTools::Handler.should_receive(:exec).with(:in_thumb, video, index)
+        VTools::Hook.should_receive(:exec).with(:in_thumb, video, index)
       end
 
       @thumbnailer.should_receive(:set_point).exactly(3).times.and_return { |sec| sec }
@@ -119,13 +119,29 @@ describe VTools::Thumbnailer do
       prepare_thumbnailer ["thumbnailer error", "thumbnailer error 2"]
 
 
-      VTools::Handler.should_receive(:exec).with(
+      VTools::Hook.should_receive(:exec).with(
         :thumb_error, video,
         " Errors: thumbnailer error (/video.name_0.jpg);thumbnailer error 2 (/video.name_1.jpg). "
       )
 
       @thumbnailer.should_not_receive(:time_offset)
       @thumbnailer.should_receive(:set_point).exactly(2).times.and_return { |sec| sec }
+
+      expect { @thumbnailer.run }.to raise_error VTools::ProcessError, /Thumbnailer error:/
+    end
+
+    it "processes invalid encoding" do
+      @options = {:thumb_count => 1, :thumb_start_point => 0}
+      prepare_thumbnailer [
+        File.readlines(
+          "#{File.realpath(File.dirname(__FILE__))}/fixtures/outputs/file_with_iso-8859-1.txt"
+        )[10]
+      ]
+
+      VTools::Hook.should_receive(:exec).with(:thumb_error, video, / Errors: /)
+
+      @thumbnailer.should_not_receive(:time_offset)
+      @thumbnailer.should_receive(:set_point).and_return { |sec| sec }
 
       expect { @thumbnailer.run }.to raise_error VTools::ProcessError, /Thumbnailer error:/
     end

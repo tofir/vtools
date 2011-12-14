@@ -5,21 +5,21 @@ describe VTools::Options do
 
   # hooks
   before :all do
-    
+
   end
 
   # around to test inside the methods
 
   before do
-    
+
   end
 
   after do
-    
+
   end
 
   after :all do
-    
+
   end
 
   # specs

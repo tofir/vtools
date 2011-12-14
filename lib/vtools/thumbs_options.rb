@@ -42,7 +42,7 @@ module VTools
 
       params.join " "
     end
-    
+
     # options parser
     def parse! options
 

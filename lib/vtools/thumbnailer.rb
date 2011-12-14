@@ -24,7 +24,7 @@ module VTools
       command = "#{CONFIG[:thumb_binary]} -i '#{@video.path}' #{options} "
 
       # callback
-      Handler.exec :before_thumb, @video, options
+      Hook.exec :before_thumb, @video, options
 
       # process cicle
       @total.times do |count|
@@ -36,11 +36,13 @@ module VTools
         options = nil
 
         Open3.popen3(exec) do |stdin, stdout, stderr|
+          lines = stdout.readlines.join(" ")
+          VTools.fix_encoding lines
           # save thumb if no error
-          if (error = VTools.fix_encoding(stdout.readlines).join(" ")).empty?
+          if (error = lines).empty?
             thumbs << thumb = {:path => file, :offset => time_offset(seconds)}
 
-            Handler.exec :in_thumb, @video, thumb # callbacks
+            Hook.exec :in_thumb, @video, thumb # callbacks
           else
             errors << "#{error} (#{file})"
           end
@@ -49,10 +51,10 @@ module VTools
 
       # callbacks
       if errors.empty?
-        Handler.exec :thumb_success, @video, thumbs
+        Hook.exec :thumb_success, @video, thumbs
       else
         errors = " Errors: #{errors.flatten.join(";").gsub(/\n/, ' ')}. "
-        Handler.exec :thumb_error, @video, errors
+        Hook.exec :thumb_error, @video, errors
         raise ProcessError, "Thumbnailer error: #{errors}" if thumbs.empty? && @total > 0
       end
 

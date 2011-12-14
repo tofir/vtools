@@ -8,7 +8,7 @@ module VTools
     module Common
 
       @@logger = nil
-  
+
       # custom logger
       def logger= logger
         @@logger = logger
@@ -16,7 +16,7 @@ module VTools
 
       # logger mechanics
       def log level, message = ""
-  
+
         if CONFIG[:logging]
           unless @@logger
             output = CONFIG[:log_file] || STDOUT
@@ -28,7 +28,7 @@ module VTools
           @@logger.send(level, message) if @@logger
         end
       end
-      
+
       # converts json to the ruby object
       # returns nil on invalid JSON
       def json_to_obj json_str
@@ -78,18 +78,28 @@ module VTools
 
       # function to create correct subdirectories to the file
       def generate_path file_name, scope = "video"
-        storage = CONFIG[:"#{scope}_storage"]
-        return instance_exec(file_name, &storage) if storage.is_a? Proc
-        (!storage || storage.empty? ? CONFIG[:PWD] : storage).to_s.strip.gsub(%r#/$#, '')
+        generator = CONFIG[:"#{scope}_path_generator"]
+        begin
+          generator = instance_exec(file_name, &generator).to_s if generator.is_a? Proc
+        rescue => e
+          generator = nil
+          raise ConfigError, "Path generator error (#{e})"
+        end
+
+        storage = CONFIG[:"#{scope}_storage"].to_s
+        storage += "/" unless storage.empty?
+        storage += generator || ""
+
+        (!storage || storage.empty? ? CONFIG[:PWD] : storage).to_s.strip.gsub(%r#/+#, '/').gsub(%r#/$#, '')
       end
 
       # path generator setter
       def path_generator scope = nil, &block
         if scope
           scope = "thumb" unless scope == "video"
-          CONFIG[:"#{scope}_storage"] = block
+          CONFIG[:"#{scope}_path_generator"] = block
         else
-          CONFIG[:thumb_storage] = CONFIG[:video_storage] = block
+          CONFIG[:thumb_path_generator] = CONFIG[:video_path_generator] = block
         end if block_given?
       end
 

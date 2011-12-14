@@ -3,7 +3,7 @@
 module VTools
 
   # Video instance
-  class Video 
+  class Video
 
     attr_reader :path, :name, :duration, :start, :bitrate,
                 :video_stream, :video_codec, :video_bitrate, :colorspace, :frame_rate,
@@ -42,13 +42,13 @@ module VTools
 
     # generate thumbs
     def create_thumbs setup = {}
-      @thumbs_options = ThumbsOptions.new setup.merge({:aspect => calculated_aspect_ratio})
+      @thumbs_options = ThumbsOptions.new setup
       @thumbnailer.run
     end
 
     # convert video
     def convert setup = {}
-      @convert_options = ConvertOptions.new(setup)
+      @convert_options = ConvertOptions.new(setup, {:aspect => calculated_aspect_ratio})
       @converter.run
     end
 

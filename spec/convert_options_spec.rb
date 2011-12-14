@@ -155,7 +155,7 @@ describe VTools::ConvertOptions do
       @options.method(:perform).call values
       values[:s].should be nil
     end
-  end  
+  end
 
   context "#parse!" do
 
@@ -205,7 +205,7 @@ describe VTools::ConvertOptions do
       expect {@options.method(:parse!).call(123) }.to raise_error VTools::ConfigError
       expect {@options.method(:parse!).call("nonexistent") }.to raise_error VTools::ConfigError
     end
-  end  
+  end
 
   context "#recalculate" do
 
@@ -271,7 +271,7 @@ describe VTools::ConvertOptions do
         height.should == result[1]
       end
     end
-  end  
+  end
 
   context "#initialize" do
     it "valid calls methods" do

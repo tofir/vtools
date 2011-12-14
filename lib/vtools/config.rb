@@ -6,25 +6,28 @@ module VTools
   CONFIG = {
 
     # system environment
-    :PWD              => Dir.getwd,
-    :library          => [],
-    :logging          => nil,
-    :log_file         => nil,
-    :config_file      => nil,
-    :ffmpeg_binary    => '/usr/bin/ffmpeg',
-    :thumb_binary     => '/usr/bin/ffmpegthumbnailer',
+    :PWD                  => Dir.getwd,
+    :library              => [],
+    :logging              => nil,
+    :log_file             => nil,
+    :config_file          => nil,
+    :ffmpeg_binary        => '/usr/bin/ffmpeg',
+    :thumb_binary         => '/usr/bin/ffmpegthumbnailer',
 
     # harvester
-    :max_jobs         => 5,
-    :store_jobs       => 10,
-    :harvester_timer  => 3,
-    :temp_dir         => '',
+    :max_jobs             => 5,
+    :store_jobs           => 10,
+    :harvester_timer      => 3,
+    :temp_dir             => '',
 
     # converter
-    :video_storage    => nil,
-    :validate_duration => nil,
+    :video_storage        => '',
+    :video_path_generator => nil,
+    :validate_duration    => nil,
+
     # thumbnailer
-    :thumb_storage    => nil,
+    :thumb_storage        => '',
+    :thumb_path_generator => nil,
 
     # predefined video qualities
     :video_set => {
@@ -61,7 +64,7 @@ module VTools
       :w600 => [600, 10, 5, 0],
     }
   }
-  
+
   # parse external config file
   def CONFIG.load!
     begin
@@ -72,7 +75,7 @@ module VTools
       raise ConfigError, "Invalid config data #{e}"
     end if self[:config_file]
   end
-  
+
   # merge config data
   def CONFIG.append! data
     direct = [:ffmpeg_binary, :thumb_binary, :max_jobs, :store_jobs,

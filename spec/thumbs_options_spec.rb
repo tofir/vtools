@@ -91,7 +91,7 @@ describe VTools::ThumbsOptions do
     it "converts valid data" do
       values = { :quality => 5, :width => 600, :time => 123 }
       @options.method(:perform).call values
-      
+
       values[:q].should == values[:quality]
       values[:s].should == values[:width]
       values[:t].should == values[:t]

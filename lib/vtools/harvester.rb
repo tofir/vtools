@@ -53,7 +53,7 @@ module VTools
         @jobs.delete job
       end
 
-      # error handler
+      # error hook
       def with_error_handle &block
         # catch job exceptions here
         begin

@@ -7,42 +7,55 @@ $ vtools start -- -r library
 $ vtools start -- -r library.rb
 
 ```ruby
-# -*- encoding: binary -*-
+# encoding: binary
+
 
 # path generator
-VTools.path_generator do |file_name|
+VTools.path_generator("video") do |file_name|
 
-  storage_path = VTools::CONFIG[:PWD] + "/../test_storage"
   first = file_name[0...2]
   second = file_name[2...4]
-  # create all parent dirs (storage... path .. ) ???
-  if (error = `mkdir -p #{storage_path}/#{first}/#{second}`).empty?
-    "#{storage_path}/#{first}/#{second}"
+  # create all parent dirs (storage... path .. )
+  error = `mkdir -p #{VTools::CONFIG[:video_storage]}/#{first}/#{second}`
+  if error.empty?
+    "#{first}/#{second}"
   else
     raise Exception, "Can't create storage dirs (#{error})"
   end
 end
 
-# storage setup
+
+# setup storage:
 VTools::Storage.setup do
 
+  # connection setup
   connect_action do
-    @mq = MQ.new
-    print "----------- connected to the MQ -------\n"
+    require "zmq"
+    @mq = ZMQ::Context.new(1)
+
+    @pull = @mq.socket(ZMQ::PULL)
+    @push = @mq.socket(ZMQ::PUSH)
+
+    # connect to the mq fibers
+    @pull.bind("tcp://*:4440");
+    @push.connect("tcp://*:5555");
   end
 
-  # recieve data for processing
+  # message reciever
+  # should return JSON encoded string
+  # see complete storage setup reference for details
   recv_action do
-    job = @mq.recv
-    setup = "{\"set\" : \"flv_240p\", \"acodec\" : \"#{job}\" }"
-    "{\"action\" : \"#{action}\", \"file\" : \"#{file}\", \"setup\" : #{setup} }"
+    @pull.recv
   end
 
+  # message sender
+  # receives hash: { :data => execution_result, :action => executed_action }
+  # execution_result can be video object or array with thumbnails
   send_action do |result|
-    @mq.send "video.success #{result[:action]} "
-    print "----------------> 'terminated' MQ sent (#{result[:data].to_json}) - action #{result[:action]}\n"
+    @push.send "#{result[:action]} #{result[:data].name}" if result[:action] =~ /convert|info/
   end
 end
+
 
 # hooks
 VTools::Handler.collection do

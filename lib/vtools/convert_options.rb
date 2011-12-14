@@ -6,8 +6,9 @@ module VTools
   class ConvertOptions < Hash
     include SharedMethods
 
-    def initialize options = {}
+    def initialize options = {}, additional = {}
       @ignore = [:width, :height, :resolution, :extension, :preserve_aspect, :duration, :postfix]
+      merge! additional
       parse! options
     end
 
@@ -94,14 +95,14 @@ module VTools
       hash[:t] = hash[:duration] if hash[:duration]
 
       dimmensions = hash[:resolution] ||
-        ("#{hash[:width]}x#{hash[:height]}" if hash[:width] && hash[:height]) ||
+        ("#{hash[:width].to_i}x#{hash[:height].to_i}" if hash[:width] && hash[:height]) ||
         hash[:s]
 
       if dimmensions
         # recreate dimmensions dimmensions
         if hash[:preserve_aspect]
           width, height = recalculate dimmensions
-          dimmensions = "#{width}x#{height}"
+          dimmensions = "#{width.to_i}x#{height.to_i}"
         end
 
         hash[:s] = dimmensions
@@ -114,7 +115,7 @@ module VTools
     def recalculate dimm
       width, height = dimm.split("x").map(&:to_f)
 
-      return [width, height] unless self[:aspect]
+      return [width, height].map(&:to_i) unless self[:aspect]
 
       # width main:
       if self[:aspect] > 1

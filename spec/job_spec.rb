@@ -17,7 +17,7 @@ describe VTools::Job do
   context "#execute" do
 
     def stub_methods
-      VTools::Handler.stub!(:exec).and_return nil
+      VTools::Hook.stub!(:exec).and_return nil
 
       @video.stub(:get_info).and_return {"info.result"}
       @video.stub(:convert).and_return {"encoded.result"}
@@ -34,8 +34,8 @@ describe VTools::Job do
       stub_methods
       set_action "info"
 
-      VTools::Handler.should_receive(:exec).with(:job_started, @video, "info")
-      VTools::Handler.should_receive(:exec).with(:job_finished, "info.result", @video, "info")
+      VTools::Hook.should_receive(:exec).with(:job_started, @video, "info")
+      VTools::Hook.should_receive(:exec).with(:job_finished, "info.result", @video, "info")
       @video.should_receive(:get_info)
 
       @job.execute.should == "info.result"
@@ -45,8 +45,8 @@ describe VTools::Job do
       stub_methods
       set_action "convert"
 
-      VTools::Handler.should_receive(:exec).with(:job_started, @video, "convert")
-      VTools::Handler.should_receive(:exec).with(:job_finished, "encoded.result", @video, "convert")
+      VTools::Hook.should_receive(:exec).with(:job_started, @video, "convert")
+      VTools::Hook.should_receive(:exec).with(:job_finished, "encoded.result", @video, "convert")
       @video.should_receive(:convert)
 
       @job.execute.should == "encoded.result"
@@ -56,8 +56,8 @@ describe VTools::Job do
       stub_methods
       set_action "thumbs"
 
-      VTools::Handler.should_receive(:exec).with(:job_started, @video, "thumbs")
-      VTools::Handler.should_receive(:exec).with(:job_finished, "thumbs.result", @video, "thumbs")
+      VTools::Hook.should_receive(:exec).with(:job_started, @video, "thumbs")
+      VTools::Hook.should_receive(:exec).with(:job_finished, "thumbs.result", @video, "thumbs")
       @video.should_receive(:create_thumbs)
 
       @job.execute.should == "thumbs.result"
@@ -68,7 +68,7 @@ describe VTools::Job do
   context "#validate" do
 
     it "accepts options" do
-      
+
       ["convert", "thumbs", "info"].each do |action|
         conf = config.dup
         conf.action = action
@@ -84,7 +84,7 @@ describe VTools::Job do
         expect { @job.validate(conf) }.to raise_error VTools::ConfigError, message_rx
       end
 
-      
+
       ["convert", "thumbs", "info"].each do |action|
         # empty config
         conf = OpenStruct.new({})

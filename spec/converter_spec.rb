@@ -46,7 +46,7 @@ describe VTools::Converter do
       # "#{CONFIG[:ffmpeg_binary]} -y -i '#{@video.path}' #{@options} '#{@output_file}'"
       exec_com = "tested.ffmpeg -y -i 'video/path' test.options '#{@output_file}'"
 
-      VTools::Handler.should_receive(:exec).with(:before_convert, video, exec_com)
+      VTools::Hook.should_receive(:exec).with(:before_convert, video, exec_com)
       VTools.should_receive(:fix_encoding).exactly(values_set.size).times
       @converter.should_receive(:generate_path)
     end
@@ -55,10 +55,10 @@ describe VTools::Converter do
       prepare_converter ffmpeg_7
 
       ffmpeg_7.each do |sec, time_str|
-        VTools::Handler.should_receive(:exec).with(:in_convert, video, sec/ffmpeg_7.keys.last)
+        VTools::Hook.should_receive(:exec).with(:in_convert, video, sec/ffmpeg_7.keys.last)
       end
 
-      VTools::Handler.should_receive(:exec).with(:convert_success, video, @output_file)
+      VTools::Hook.should_receive(:exec).with(:convert_success, video, @output_file)
       @converter.should_receive(:encoding_invalid?) { false }
       @converter.should_receive(:encoded)
 
@@ -69,16 +69,16 @@ describe VTools::Converter do
       prepare_converter ffmpeg_8
 
       ffmpeg_8.each do |sec, time_str|
-        VTools::Handler.should_receive(:exec).with(:in_convert, video, sec/ffmpeg_8.keys.last)
+        VTools::Hook.should_receive(:exec).with(:in_convert, video, sec/ffmpeg_8.keys.last)
       end
 
-      VTools::Handler.should_receive(:exec).with(:convert_success, video, @output_file)
+      VTools::Hook.should_receive(:exec).with(:convert_success, video, @output_file)
       @converter.should_receive(:encoding_invalid?) { false }
       @converter.should_receive(:encoded)
 
       @converter.run
     end
-    
+
     context "fails encoding" do
 
       it "--no time received" do
@@ -87,7 +87,7 @@ describe VTools::Converter do
       end
 
       it "--result file is invalid" do
-        VTools::Handler.stub(:exec).and_return nil
+        VTools::Hook.stub(:exec).and_return nil
         prepare_converter ffmpeg_7
         @converter.should_receive(:encoding_invalid?) { "test.fail" }
         expect { @converter.run }.to raise_error VTools::ProcessError, "test.fail"

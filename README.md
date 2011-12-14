@@ -19,7 +19,7 @@ Please read changelog to check ffmpeg versions compatibility (vtools understands
 Before start, daemon should be configured correctly, to have valid access to the storage.
 Mandatory methods are: **connect**, **recv** and **send**.
 
-``` ruby
+```ruby
 #--file library.rb--#
 # encoding: binary
 
@@ -103,7 +103,7 @@ To launch daemon - is enough to require library with storage setup:
 
 By default the `logger` gem is used. But there is possibility to set custom logger, that is compatible with the default logger.
 
-``` ruby
+```ruby
 VTools.logger = CustomLoger.new($stdout)
 ```
 
@@ -112,7 +112,7 @@ VTools.logger = CustomLoger.new($stdout)
 Path generator is used by the thumnailer, converter or both to generate necessary dir tree logic for the media.
 It accepts file name and should return relative path (excluding file name itself)
 
-``` ruby
+```ruby
 # path generator (used to )
 VTools.path_generator do |file_name|
   # ..
@@ -123,7 +123,7 @@ end
 
 **Network calls** (TCP GET request, that will return message body content, ignoring response headers)
 
-``` ruby
+```ruby
 
 # http calls
 VTools.network_call "site.com/some/uri"

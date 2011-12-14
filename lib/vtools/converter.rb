@@ -25,7 +25,7 @@ module VTools
       convert_error = true
 
       # before convert callbacks
-      Handler.exec :before_convert, @video, command
+      Hook.exec :before_convert, @video, command
 
       # process video
       Open3.popen3(command) do |stdin, stdout, stderr|
@@ -48,7 +48,7 @@ module VTools
             progress = time / @video.duration
 
             # callbacks
-            Handler.exec :in_convert, @video, progress
+            Hook.exec :in_convert, @video, progress
           end
         end
       end
@@ -57,9 +57,9 @@ module VTools
 
       # callbacks
       unless error = encoding_invalid?
-        Handler.exec :convert_success, @video, @output_file
+        Hook.exec :convert_success, @video, @output_file
       else
-        Handler.exec :convert_error, @video, error, output
+        Hook.exec :convert_error, @video, error, output
         raise ProcessError, error # raise exception in error
       end
 

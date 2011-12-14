@@ -57,7 +57,7 @@ describe VTools::SharedMethods do
 
         @class.logger = tester
         tester.should_not_receive :send
-        
+
         @class.log :test, "test"
       end
 
@@ -148,7 +148,7 @@ describe VTools::SharedMethods do
 
       let(:sock) { double nil }
       let(:tcp_request) { "GET / HTTP/1.0\r\n\r\n" }
-      
+
       def validate_request body
         sock.should_receive(:print).with( tcp_request ).once
         sock.should_receive(:read).once.and_return "headers\r\n\r\n#{body}"
@@ -209,8 +209,24 @@ describe VTools::SharedMethods do
           "test/path"
         end
 
-        VTools::CONFIG[:video_storage] = prc
-        @class.generate_path("test.filename", "video").should == "test/path"
+        VTools::CONFIG[:video_storage] = '/root/'
+        VTools::CONFIG[:video_path_generator] = prc
+        @class.generate_path("test.filename", "video").should == "/root/test/path"
+
+        VTools::CONFIG[:thumb_storage] = 'root'
+        VTools::CONFIG[:thumb_path_generator] = prc
+        @class.generate_path("test.filename", "thumb").should == "root/test/path"
+      end
+
+      it "raises exception on invalid block" do
+        prc = proc do
+          CONFIG[:thumb_storage]
+        end
+
+        VTools::CONFIG[:video_path_generator] = prc
+        expect do
+          @class.generate_path("test.filename", "video").should == "/root/test/path"
+        end.to raise_error VTools::ConfigError, /Path generator error/
       end
     end
 
@@ -219,42 +235,45 @@ describe VTools::SharedMethods do
       before do
         VTools::CONFIG[:video_storage] = nil
         VTools::CONFIG[:thumb_storage] = nil
+        VTools::CONFIG[:thumb_path_generator] = nil
+        VTools::CONFIG[:video_path_generator] = nil
       end
 
       let(:block) { proc { nil } }
 
       it "appends generator to thumbs" do
         @class.path_generator "thumb", &block
-        VTools::CONFIG[:thumb_storage].should == block
+        VTools::CONFIG[:thumb_path_generator].should == block
+        VTools::CONFIG[:video_path_generator].should be nil
       end
 
       it "appends generator to thumbs (invalid placeholedr given)" do
         @class.path_generator "invalid", &block
-        VTools::CONFIG[:thumb_storage].should == block
-        VTools::CONFIG[:video_storage].should be nil
+        VTools::CONFIG[:thumb_path_generator].should == block
+        VTools::CONFIG[:video_path_generator].should be nil
       end
 
       it "appends generator to video" do
         @class.path_generator "video", &block
-        VTools::CONFIG[:video_storage].should == block
-        VTools::CONFIG[:thumb_storage].should be nil
+        VTools::CONFIG[:video_path_generator].should == block
+        VTools::CONFIG[:thumb_path_generator].should be nil
       end
 
       it "appends generator to both (default)" do
         @class.path_generator &block
-        VTools::CONFIG[:video_storage].should == block
-        VTools::CONFIG[:thumb_storage].should == block
+        VTools::CONFIG[:video_path_generator].should == block
+        VTools::CONFIG[:thumb_path_generator].should == block
       end
 
       it "skips generator appending" do
         @class.path_generator
-        VTools::CONFIG[:video_storage].should be nil
-        VTools::CONFIG[:thumb_storage].should be nil
+        VTools::CONFIG[:video_path_generator].should be nil
+        VTools::CONFIG[:thumb_path_generator].should be nil
       end
     end
 
     context "#fix_encoding" do
-      
+
       it "fixes encoding" do
         path = "#{File.realpath(File.dirname(__FILE__))}/fixtures/outputs/"
         source = File.open("#{path}file_with_iso-8859-1.txt", "r").read
