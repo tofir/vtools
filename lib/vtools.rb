@@ -13,6 +13,7 @@ module VTools
   require 'ostruct'
   require 'open3'
   require 'logger'
+  require "fileutils"
 
   require 'vtools/version'
   require 'vtools/errors'

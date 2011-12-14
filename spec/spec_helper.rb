@@ -10,7 +10,6 @@ require "rspec"
 require "stringio"
 
 # helpers utilities
-#
 module Helpers
 
 end

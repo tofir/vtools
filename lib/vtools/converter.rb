@@ -46,9 +46,7 @@ module VTools
               time = 0.0
             end
             progress = time / @video.duration
-
-            # callbacks
-            Hook.exec :in_convert, @video, progress
+            Hook.exec :in_convert, @video, progress # callbacks
           end
         end
       end

@@ -41,7 +41,6 @@ module VTools
           # save thumb if no error
           if (error = lines).empty?
             thumbs << thumb = {:path => file, :offset => time_offset(seconds)}
-
             Hook.exec :in_thumb, @video, thumb # callbacks
           else
             errors << "#{error} (#{file})"

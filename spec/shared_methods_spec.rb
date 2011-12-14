@@ -140,7 +140,7 @@ describe VTools::SharedMethods do
         VTools::CONFIG[:test_index] = "test.value"
 
         @class.config(:test_index).should == "test.value"
-        @class.config(:nonexistent_index).should be nil
+        @class.config(:nonexistent_index).should_not be
       end
     end
 
@@ -182,55 +182,7 @@ describe VTools::SharedMethods do
       end
     end
 
-    context "#generate_path" do
-
-      it "returns valid string" do
-        VTools::CONFIG[:video_storage] = "test/path/"
-        VTools::CONFIG[:thumb_storage] = "/thumb/path"
-
-        @class.generate_path("test.filename").should == "test/path"
-        @class.generate_path("test.filename", "thumb").should == "/thumb/path"
-
-        VTools::CONFIG[:thumb_storage] = ''
-
-        VTools::CONFIG[:PWD] = "test/pwd"
-        @class.generate_path("test.filename", "thumb").should == "test/pwd"
-
-        VTools::CONFIG[:PWD] = nil
-        VTools::CONFIG[:thumb_storage] = nil
-
-        @class.generate_path("test.filename", "thumb").should == ""
-      end
-
-      it "executes block" do
-        prc = proc do |file|
-          file.should == "test.filename"
-          self.class.should == Tested
-          "test/path"
-        end
-
-        VTools::CONFIG[:video_storage] = '/root/'
-        VTools::CONFIG[:video_path_generator] = prc
-        @class.generate_path("test.filename", "video").should == "/root/test/path"
-
-        VTools::CONFIG[:thumb_storage] = 'root'
-        VTools::CONFIG[:thumb_path_generator] = prc
-        @class.generate_path("test.filename", "thumb").should == "root/test/path"
-      end
-
-      it "raises exception on invalid block" do
-        prc = proc do
-          CONFIG[:thumb_storage]
-        end
-
-        VTools::CONFIG[:video_path_generator] = prc
-        expect do
-          @class.generate_path("test.filename", "video").should == "/root/test/path"
-        end.to raise_error VTools::ConfigError, /Path generator error/
-      end
-    end
-
-    context "#path_generator" do
+    context "paths generator" do
 
       before do
         VTools::CONFIG[:video_storage] = nil
@@ -239,36 +191,126 @@ describe VTools::SharedMethods do
         VTools::CONFIG[:video_path_generator] = nil
       end
 
-      let(:block) { proc { nil } }
+      context "#generate_path" do
 
-      it "appends generator to thumbs" do
-        @class.path_generator "thumb", &block
-        VTools::CONFIG[:thumb_path_generator].should == block
-        VTools::CONFIG[:video_path_generator].should be nil
+        before do
+          File.stub(:exists?).and_return(true)
+          VTools::CONFIG[:PWD] = ""
+        end
+
+        context "using string path from" do
+          it "config storage" do
+            VTools::CONFIG[:video_storage] = "test/path/"
+            VTools::CONFIG[:thumb_storage] = "/thumb/path"
+
+            @class.generate_path("test.filename").should == "test/path"
+            @class.generate_path("test.filename", "thumb").should == "/thumb/path"
+          end
+
+          it "CONFIG[:PWD]" do
+
+            VTools::CONFIG[:thumb_storage] = ''
+            VTools::CONFIG[:PWD] = "test/pwd"
+            @class.generate_path("test.filename", "thumb").should == "test/pwd"
+            @class.generate_path("test.filename").should == "test/pwd"
+          end
+
+          it "empty set" do
+            @class.generate_path("test.filename").should == ""
+          end
+        end
+
+        context "using callback" do
+
+          let(:failed_prc) { proc { CONFIG[:thumb_storage] } }
+          let(:prc) {
+            proc do |file|
+              file.should == "test.filename"
+              self.class.should == Tested
+              "test/path"
+            end
+          }
+
+
+          it "executes block" do
+            VTools::CONFIG[:video_storage] = '/root/'
+            VTools::CONFIG[:video_path_generator] = prc
+            @class.generate_path("test.filename", "video").should == "/root/test/path"
+
+            VTools::CONFIG[:thumb_storage] = 'root'
+            VTools::CONFIG[:thumb_path_generator] = prc
+            @class.generate_path("test.filename", "thumb").should == "root/test/path"
+          end
+
+          it "raises exception on invalid block" do
+            VTools::CONFIG[:video_path_generator] = failed_prc
+            expect do
+              @class.generate_path("test.filename", "video")
+            end.to raise_error VTools::ConfigError, /Path generator error/
+          end
+        end
+
+        context "creates path" do
+
+          before do
+            File.stub(:exists?).and_return(false)
+            VTools::CONFIG[:video_storage] = "/root/"
+          end
+
+          it "successfull" do
+            FileUtils.should_receive(:mkdir_p).and_return(nil)
+
+            expect do
+              @class.generate_path("test.filename").should == "/root"
+            end.to_not raise_error
+          end
+
+          it "with error" do
+            FileUtils.should_receive(:mkdir_p).and_return do
+              raise Errno::EACCES, "Permission denied"
+            end
+
+            expect do
+              @class.generate_path("test.filename")
+            end.to raise_error VTools::FileError, /Path generator error: /
+          end
+        end
       end
 
-      it "appends generator to thumbs (invalid placeholedr given)" do
-        @class.path_generator "invalid", &block
-        VTools::CONFIG[:thumb_path_generator].should == block
-        VTools::CONFIG[:video_path_generator].should be nil
-      end
+      context "#path_generator appended to" do
 
-      it "appends generator to video" do
-        @class.path_generator "video", &block
-        VTools::CONFIG[:video_path_generator].should == block
-        VTools::CONFIG[:thumb_path_generator].should be nil
-      end
+          let(:block_stub) { proc {nil} }
 
-      it "appends generator to both (default)" do
-        @class.path_generator &block
-        VTools::CONFIG[:video_path_generator].should == block
-        VTools::CONFIG[:thumb_path_generator].should == block
-      end
+        it "thumbs only" do
+          @class.path_generator "thumbs path", &block_stub
+          VTools::CONFIG[:thumb_path_generator].should == block_stub
+          VTools::CONFIG[:video_path_generator].should_not be
+        end
 
-      it "skips generator appending" do
-        @class.path_generator
-        VTools::CONFIG[:video_path_generator].should be nil
-        VTools::CONFIG[:thumb_path_generator].should be nil
+        it "thumbs path only (invalid placeholedr given)" do
+          @class.path_generator "invalid", &block_stub
+          VTools::CONFIG[:thumb_path_generator].should == block_stub
+          VTools::CONFIG[:video_path_generator].should_not be
+        end
+
+        it "video path" do
+          @class.path_generator "video", &block_stub
+          VTools::CONFIG[:video_path_generator].should == block_stub
+          VTools::CONFIG[:thumb_path_generator].should_not be
+        end
+
+        it "both paths (default)" do
+          @class.path_generator &block_stub
+          [:video_path_generator, :thumb_path_generator].each do |index|
+            VTools::CONFIG[index].should == block_stub
+          end
+        end
+
+        it "nothing" do
+          @class.path_generator
+          VTools::CONFIG[:video_path_generator].should_not be
+          VTools::CONFIG[:thumb_path_generator].should_not be
+        end
       end
     end
 

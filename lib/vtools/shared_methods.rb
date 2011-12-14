@@ -1,7 +1,6 @@
 # -*- encoding: binary -*-
 
 module VTools
-
   # shared methods
   module SharedMethods
     # both static & instance bindings
@@ -83,14 +82,22 @@ module VTools
           generator = instance_exec(file_name, &generator).to_s if generator.is_a? Proc
         rescue => e
           generator = nil
-          raise ConfigError, "Path generator error (#{e})"
+          raise ConfigError, "Path generator error: (#{e})"
         end
 
         storage = CONFIG[:"#{scope}_storage"].to_s
         storage += "/" unless storage.empty?
         storage += generator || ""
 
-        (!storage || storage.empty? ? CONFIG[:PWD] : storage).to_s.strip.gsub(%r#/+#, '/').gsub(%r#/$#, '')
+        path = (!storage || storage.empty? ? CONFIG[:PWD] : storage).to_s.strip.gsub(%r#/+#, '/').gsub(%r#/$#, '')
+
+        # generate path
+        begin
+          FileUtils.mkdir_p path, :mode => 775
+        rescue => e
+          raise FileError, "Path generator error: #{e}"
+        end unless File.exists?(path)
+        path
       end
 
       # path generator setter
