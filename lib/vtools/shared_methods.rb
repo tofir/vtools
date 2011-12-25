@@ -93,7 +93,7 @@ module VTools
 
         # generate path
         begin
-          FileUtils.mkdir_p path, :mode => 775
+          FileUtils.mkdir_p path, :mode => 0755
         rescue => e
           raise FileError, "Path generator error: #{e}"
         end unless File.exists?(path)

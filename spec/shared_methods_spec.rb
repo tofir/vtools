@@ -258,10 +258,11 @@ describe VTools::SharedMethods do
           end
 
           it "successfull" do
-            FileUtils.should_receive(:mkdir_p).and_return(nil)
+            VTools::CONFIG[:video_path_generator] = proc { "test/path" }
+            FileUtils.should_receive(:mkdir_p).with("/root/test/path", :mode => 0755).and_return(nil)
 
             expect do
-              @class.generate_path("test.filename").should == "/root"
+              @class.generate_path("test.filename").should == "/root/test/path"
             end.to_not raise_error
           end
 

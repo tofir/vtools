@@ -2,9 +2,8 @@
 
 Library can be required via `-r` option
 
-$ vtools start -- -r library
-
-$ vtools start -- -r library.rb
+    $ vtools start -- -r library
+    $ vtools start -- -r library.rb
 
 ```ruby
 # encoding: binary
@@ -12,16 +11,7 @@ $ vtools start -- -r library.rb
 
 # path generator
 VTools.path_generator("video") do |file_name|
-
-  first = file_name[0...2]
-  second = file_name[2...4]
-  # create all parent dirs (storage... path .. )
-  error = `mkdir -p #{VTools::CONFIG[:video_storage]}/#{first}/#{second}`
-  if error.empty?
-    "#{first}/#{second}"
-  else
-    raise Exception, "Can't create storage dirs (#{error})"
-  end
+  "#{file_name[0...2]}/#{file_name[2...4]}"
 end
 
 
@@ -52,7 +42,12 @@ VTools::Storage.setup do
   # receives hash: { :data => execution_result, :action => executed_action }
   # execution_result can be video object or array with thumbnails
   send_action do |result|
-    @push.send "#{result[:action]} #{result[:data].name}" if result[:action] =~ /convert|info/
+    case result[:action]
+    when /convert|info/ # video instance here
+      @push.send "#{result[:action]} #{result[:data].name}"
+    when /thumbs/ # array with thumbs here
+      @push.send "#{result[:action]} #{result[:data]}"
+    end
   end
 end
 

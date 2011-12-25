@@ -2,11 +2,10 @@
 
 To make VTools parse config file it should be given to it with -c option:
 
-  $ vtools start -- -c config.json
+    $ vtools start -- -c config.json
 
 
 ## Format
-
 
     #system
     :ffmpeg_binary:     'ffmpeg'
@@ -20,10 +19,10 @@ To make VTools parse config file it should be given to it with -c option:
 
     #converter
     :validate_duration: false
-    :video_storage:     "/home/projects/video_storage"
+    :video_storage:     "/home/projects/storage/video"
 
     #thumbnailer
-    :thumb_storage:     "/home/projects/thumb_storage"
+    :thumb_storage:     "/home/projects/storage/thumb"
 
     #predefined video qualities
     :video_set:
